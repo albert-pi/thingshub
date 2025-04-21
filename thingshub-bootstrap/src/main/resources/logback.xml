@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds"
+	debug="false">
+	<!-- 日志存放路径 -->
+	<!-- <property name="LOG_PATH" value="${sys:log.path}"/> -->
+	<property name="LOG_PATH" value="../logs" />
+
+	<!-- 日志level -->
+	<!-- <property name="LOG_LEVEL_REACTOR_NETTY" value="${sys:log.level.reactor.netty}"/> -->
+
+	<!-- 日志输出格式 -->
+	<property name="DEFAULT_PATTERN" value="%d [%thread] %-5level %logger{20}[%line] - %msg%n" />
+	<property name="TRANSPORT_PROCESSOR_PATTERN" value="%d [%thread] %-5level %logger{20}[%line] - [%X{clientAddr}] [%X{clientId}] [%X{protocol}] [%X{msgName}] [%X{packetId}] [%X{serverAddr}] - %msg%n" />
+
+	<appender name="DEFAULT_CONSOLE_APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${DEFAULT_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="TRANSPORT_PROCESSOR_CONSOLE_APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- <filter class="ch.qos.logback.core.filter.EvaluatorFilter"> -->
+		<!-- <evaluator> -->
+		<!-- <matcher> -->
+		<!-- <Name>processorMatcher</Name> -->
+		<!-- <regex>com\\.zhongzhi\\.thingshub\\.transport\\..*Processor"</regex> -->
+		<!-- </matcher> -->
+		<!-- <expression>processorMatcher.matches(logger)</expression> -->
+		<!-- </evaluator> -->
+		<!-- <OnMismatch>NEUTRAL</OnMismatch> -->
+		<!-- <OnMatch>DENY</OnMatch> -->
+		<!-- </filter> -->
+		<encoder>
+			<pattern>${TRANSPORT_PROCESSOR_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}/sys/thingshub.log</file>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/sys/thingshub-%d{yyyy-MM-dd}-%i.log
+			</fileNamePattern>
+			<MaxHistory>10</MaxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${DEFAULT_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="LUCENE" class="io.thingshub.logging.logback.LuceneAppender">
+		<dir>${LOG_PATH}/biz</dir>
+		<encoder class="io.thingshub.logging.logback.LogModelEncoder">
+			<pattern>${DEFAULT_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="io.thingshub.transport.processor" additivity="false" level="DEBUG">
+		<appender-ref ref="TRANSPORT_PROCESSOR_CONSOLE_APPENDER" />
+		<!-- <appender-ref ref="FILE" /> -->
+		<!-- <appender-ref ref="LUCENE" /> -->
+	</logger>
+	
+	<logger name="io.thingshub" additivity="false" level="DEBUG">
+		<appender-ref ref="DEFAULT_CONSOLE_APPENDER" />
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<logger name="org.apache.ignite" additivity="false" level="INFO">
+		<appender-ref ref="DEFAULT_CONSOLE_APPENDER" />
+		<appender-ref ref="FILE" />
+	</logger>
+	
+	<logger name="org.apache.ignite.internal.IgniteKernal" additivity="false" level="ERROR">
+		<appender-ref ref="DEFAULT_CONSOLE_APPENDER" />
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<logger name="org.casbin.jcasbin" additivity="false" level="ERROR">
+		<appender-ref ref="DEFAULT_CONSOLE_APPENDER" />
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<logger name="reactor.netty" additivity="false" level="INFO">
+		<appender-ref ref="DEFAULT_CONSOLE_APPENDER" />
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<root level="info">
+		<appender-ref ref="DEFAULT_CONSOLE_APPENDER" />
+		<appender-ref ref="FILE" />
+	</root>
+
+</configuration>
